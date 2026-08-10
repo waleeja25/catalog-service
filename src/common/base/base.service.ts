@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DeepPartial, FindOneOptions, Repository } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { EntityNotFoundException } from '../exceptions';
 
 @Injectable()
 export abstract class BaseService<T extends BaseEntity> {
@@ -26,7 +27,7 @@ export abstract class BaseService<T extends BaseEntity> {
     });
 
     if (!entity) {
-      throw new NotFoundException();
+      throw new EntityNotFoundException(this.entityName, id);
     }
 
     return entity;
@@ -36,7 +37,7 @@ export abstract class BaseService<T extends BaseEntity> {
     const entity = await this.findById(id);
 
     if (!entity) {
-      throw new NotFoundException();
+      throw new EntityNotFoundException(this.entityName, id);
     }
 
     this.repository.merge(entity, data);
@@ -48,7 +49,7 @@ export abstract class BaseService<T extends BaseEntity> {
     const entity = await this.findById(id);
 
     if (!entity) {
-      throw new NotFoundException();
+      throw new EntityNotFoundException(this.entityName, id);
     }
 
     await this.repository.remove(entity);
