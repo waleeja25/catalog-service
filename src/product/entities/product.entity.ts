@@ -23,6 +23,10 @@ export class Product extends BaseEntity {
   })
   price!: number;
 
+  @Column()
+  @Index()
+  categoryId!: number;
+
   @ManyToOne(() => Category, (category) => category.products, {
     onDelete: 'NO ACTION',
     nullable: false,
@@ -30,6 +34,5 @@ export class Product extends BaseEntity {
   @JoinColumn({
     name: 'categoryId',
   })
-  @Index()
   category!: Category;
 }

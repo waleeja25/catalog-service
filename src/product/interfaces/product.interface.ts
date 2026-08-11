@@ -19,17 +19,31 @@ export interface CategorySummary {
   description: string;
 }
 
-export interface Product {
+export interface ProductResponse {
   id: number;
   name: string;
-  description: string;
+  description?: string;
   price: number;
   categoryId: number;
   createdAt: string;
   updatedAt: string;
-  category?: CategorySummary;
+  category: CategorySummary;
+}
+
+export interface ListProductsRequest {
+  page: number;
+  limit: number;
+  search?: string;
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
 
 export interface ProductListResponse {
-  data: Product[];
+  data: ProductResponse[];
+  meta: PaginationMeta;
 }

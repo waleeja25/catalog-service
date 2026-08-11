@@ -1,0 +1,110 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { BaseService, EntityNotFoundException } from '../common';
+
+import { CategoryService } from '../category/category.service';
+
+import {
+  CreateProductRequest,
+  UpdateProductRequest,
+  ListProductsRequest,
+  ProductListResponse,
+  ProductResponse,
+} from './interfaces';
+
+import { Product } from './entities';
+import { ProductMapper } from './product.mapper';
+
+@Injectable()
+export class ProductsService extends BaseService<Product> {
+  constructor(
+    @InjectRepository(Product)
+    repository: Repository<Product>,
+    private readonly categoriesService: CategoryService,
+  ) {
+    super(repository);
+  }
+
+  async createProduct(request: CreateProductRequest): Promise<ProductResponse> {
+    await this.categoriesService.findById(request.categoryId);
+
+    const product = await super.create(request);
+
+    return this.getProductById(product.id);
+  }
+
+  async updateProduct(request: UpdateProductRequest): Promise<ProductResponse> {
+    const { id, ...data } = request;
+
+    if (data.categoryId !== undefined) {
+      await this.categoriesService.findById(data.categoryId);
+    }
+
+    await super.update(id, data);
+
+    return this.getProductById(id);
+  }
+
+  async getProductById(id: number): Promise<ProductResponse> {
+    const product = await this.findOne({
+      where: { id },
+      relations: {
+        category: true,
+      },
+    });
+
+    if (!product) {
+      throw new EntityNotFoundException('Product', id);
+    }
+
+    return ProductMapper.toResponse(product);
+  }
+
+  async listProducts(
+    request: ListProductsRequest,
+  ): Promise<ProductListResponse> {
+    const page = request.page > 0 ? request.page : 1;
+
+    const limit =
+      request.limit > 0 && request.limit <= 100 ? request.limit : 10;
+
+    const search = request.search?.trim();
+
+    const query = this.repository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category');
+
+    if (search) {
+      query.where(
+        `(
+          product.name LIKE :search
+          OR product.description LIKE :search
+          OR category.name LIKE :search
+        )`,
+        {
+          search: `%${search}%`,
+        },
+      );
+    }
+
+    query
+      .orderBy('product.id', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [products, total] = await query.getManyAndCount();
+
+    return {
+      data: products.map((product) => ProductMapper.toResponse(product)),
+
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+}

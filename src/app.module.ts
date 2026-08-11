@@ -11,6 +11,7 @@ import {
   GrpcExceptionFilter,
 } from './common';
 import { CategoryModule } from './category/category.module';
+import { ProductModule } from './product/products.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CategoryModule } from './category/category.module';
     }),
 
     CategoryModule,
+    ProductModule,
   ],
   providers: [
     {
