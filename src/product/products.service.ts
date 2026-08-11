@@ -89,12 +89,19 @@ export class ProductService extends BaseService<Product> {
       );
     }
 
+    if (request.categoryId !== undefined) {
+      query.andWhere('category.id = :categoryId', {
+        categoryId: request.categoryId,
+      });
+    }
+
     query
       .orderBy('product.id', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
     const [products, total] = await query.getManyAndCount();
+    const totalPages = Math.ceil(total / limit);
 
     return {
       data: products.map((product) => ProductMapper.toResponse(product)),
@@ -103,7 +110,7 @@ export class ProductService extends BaseService<Product> {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages,
       },
     };
   }

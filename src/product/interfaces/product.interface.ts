@@ -34,6 +34,7 @@ export interface ListProductsRequest {
   page: number;
   limit: number;
   search?: string;
+  categoryId?: number;
 }
 
 export interface PaginationMeta {
