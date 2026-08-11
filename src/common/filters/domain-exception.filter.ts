@@ -25,8 +25,11 @@ export class DomainExceptionFilter implements RpcExceptionFilter<DomainException
       case 'ENTITY_NOT_FOUND':
         return GrpcStatus.NOT_FOUND;
 
-      case 'USER_EMAIL_EXISTS':
+      case 'CATEGORY_NAME_EXISTS':
         return GrpcStatus.ALREADY_EXISTS;
+
+      case 'CATEGORY_IN_USE':
+        return GrpcStatus.FAILED_PRECONDITION;
 
       default:
         return GrpcStatus.INTERNAL;

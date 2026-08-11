@@ -28,7 +28,7 @@ import { ProductModule } from './product/products.module';
   providers: [
     {
       provide: APP_FILTER,
-      useClass: DomainExceptionFilter,
+      useClass: GrpcExceptionFilter,
     },
     {
       provide: APP_FILTER,
@@ -36,7 +36,7 @@ import { ProductModule } from './product/products.module';
     },
     {
       provide: APP_FILTER,
-      useClass: GrpcExceptionFilter,
+      useClass: DomainExceptionFilter,
     },
   ],
 })
