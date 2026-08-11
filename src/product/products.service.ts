@@ -18,7 +18,7 @@ import { Product } from './entities';
 import { ProductMapper } from './product.mapper';
 
 @Injectable()
-export class ProductsService extends BaseService<Product> {
+export class ProductService extends BaseService<Product> {
   constructor(
     @InjectRepository(Product)
     repository: Repository<Product>,

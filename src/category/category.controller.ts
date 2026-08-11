@@ -12,7 +12,7 @@ import type {
 import { CategoryService } from './category.service';
 
 @Controller()
-@GrpcController('categoryService')
+@GrpcController('CategoryService')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
