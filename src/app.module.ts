@@ -13,6 +13,8 @@ import {
 import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/products.module';
 
+import { HealthModule } from './health/health.module';
+
 @Module({
   imports: [
     AppConfigModule,
@@ -24,6 +26,7 @@ import { ProductModule } from './product/products.module';
 
     CategoryModule,
     ProductModule,
+    HealthModule,
   ],
   providers: [
     {
