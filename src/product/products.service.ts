@@ -1,18 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CatalogProto } from 'microservices-proto';
 
 import { BaseService, EntityNotFoundException } from '../common';
 
 import { CategoryService } from '../category/category.service';
-
-import {
-  CreateProductRequest,
-  UpdateProductRequest,
-  ListProductsRequest,
-  ProductListResponse,
-  ProductResponse,
-} from './interfaces';
 
 import { Product } from './entities';
 import { ProductMapper } from './product.mapper';
@@ -27,7 +20,9 @@ export class ProductService extends BaseService<Product> {
     super(repository);
   }
 
-  async createProduct(request: CreateProductRequest): Promise<ProductResponse> {
+  async createProduct(
+    request: CatalogProto.CreateProductRequest,
+  ): Promise<CatalogProto.Product> {
     await this.categoriesService.findById(request.categoryId);
 
     const product = await super.create(request);
@@ -35,7 +30,9 @@ export class ProductService extends BaseService<Product> {
     return this.getProductById(product.id);
   }
 
-  async updateProduct(request: UpdateProductRequest): Promise<ProductResponse> {
+  async updateProduct(
+    request: CatalogProto.UpdateProductRequest,
+  ): Promise<CatalogProto.Product> {
     const { id, ...data } = request;
 
     if (data.categoryId !== undefined) {
@@ -47,7 +44,7 @@ export class ProductService extends BaseService<Product> {
     return this.getProductById(id);
   }
 
-  async getProductById(id: number): Promise<ProductResponse> {
+  async getProductById(id: number): Promise<CatalogProto.Product> {
     const product = await this.findOne({
       where: { id },
       relations: {
@@ -63,8 +60,8 @@ export class ProductService extends BaseService<Product> {
   }
 
   async listProducts(
-    request: ListProductsRequest,
-  ): Promise<ProductListResponse> {
+    request: CatalogProto.ListProductsRequest,
+  ): Promise<CatalogProto.ProductListResponse> {
     const page = request.page > 0 ? request.page : 1;
 
     const limit =

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CatalogProto } from 'microservices-proto';
 
 import { BaseService, CategoryNameExistsException } from '../common';
 import { Category } from './entities';
@@ -14,7 +15,9 @@ export class CategoryService extends BaseService<Category> {
     super(repository);
   }
 
-  override async create(data: Partial<Category>): Promise<Category> {
+  override async create(
+    data: CatalogProto.CreateCategoryRequest,
+  ): Promise<Category> {
     const existingCategory = await this.findOne({
       where: {
         name: data.name,
@@ -30,7 +33,7 @@ export class CategoryService extends BaseService<Category> {
 
   override async update(
     id: number,
-    data: Partial<Category>,
+    data: CatalogProto.UpdateCategoryRequest,
   ): Promise<Category> {
     await this.findById(id);
 

@@ -1,8 +1,9 @@
+import { CatalogProto } from 'microservices-proto';
+
 import { Product } from './entities';
-import { ProductResponse } from './interfaces';
 
 export class ProductMapper {
-  static toResponse(product: Product): ProductResponse {
+  static toResponse(product: Product): CatalogProto.Product {
     return {
       id: product.id,
       name: product.name,
