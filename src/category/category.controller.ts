@@ -42,7 +42,7 @@ export class CategoryController
     const categories = await this.categoryService.list();
 
     return {
-      data: categories.map(CategoryMapper.toResponse),
+      data: categories.map((category) => CategoryMapper.toResponse(category)),
     };
   }
 }
