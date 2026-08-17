@@ -2,10 +2,14 @@ import { Controller } from '@nestjs/common';
 import { Payload } from '@nestjs/microservices';
 import { CatalogProto } from 'microservices-proto';
 
-import { GrpcController } from '../common';
+import { GrpcController, Validate, validateEntityIdRequest } from '../common';
 
 import { CategoryMapper } from './category.mapper';
 import { CategoryService } from './category.service';
+import {
+  validateCreateCategoryRequest,
+  validateUpdateCategoryRequest,
+} from './validators';
 
 @Controller()
 @GrpcController('CategoryService')
@@ -14,26 +18,36 @@ export class CategoryController
 {
   constructor(private readonly categoryService: CategoryService) {}
 
-  async create(@Payload() request: CatalogProto.CreateCategoryRequest) {
+  async create(
+    @Payload(Validate(validateCreateCategoryRequest))
+    request: CatalogProto.CreateCategoryRequest,
+  ) {
     return CategoryMapper.toResponse(
       await this.categoryService.create(request),
     );
   }
 
-  async getById(@Payload() request: CatalogProto.EntityIdRequest) {
+  async getById(
+    @Payload(Validate(validateEntityIdRequest))
+    request: CatalogProto.EntityIdRequest,
+  ) {
     return CategoryMapper.toResponse(
       await this.categoryService.findById(request.id),
     );
   }
 
-  async update(@Payload() request: CatalogProto.UpdateCategoryRequest) {
+  async update(
+    @Payload(Validate(validateUpdateCategoryRequest))
+    request: CatalogProto.UpdateCategoryRequest,
+  ) {
     return CategoryMapper.toResponse(
       await this.categoryService.update(request.id, request),
     );
   }
 
   async delete(
-    @Payload() request: CatalogProto.EntityIdRequest,
+    @Payload(Validate(validateEntityIdRequest))
+    request: CatalogProto.EntityIdRequest,
   ): Promise<void> {
     await this.categoryService.delete(request.id);
   }
