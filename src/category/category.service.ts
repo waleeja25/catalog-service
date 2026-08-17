@@ -3,14 +3,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CatalogProto } from 'microservices-proto';
 
-import { BaseService, CategoryNameExistsException } from '../common';
+import {
+  BaseService,
+  CategoryInUseException,
+  CategoryNameExistsException,
+} from '../common';
 import { Category } from './entities';
+import { Product } from '../product/entities';
 
 @Injectable()
 export class CategoryService extends BaseService<Category> {
   constructor(
     @InjectRepository(Category)
     protected readonly repository: Repository<Category>,
+
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
   ) {
     super(repository);
   }
@@ -50,5 +58,20 @@ export class CategoryService extends BaseService<Category> {
     }
 
     return super.update(id, data);
+  }
+
+  override async delete(id: number): Promise<void> {
+    await this.findById(id);
+
+    const productCount = await this.productRepository.count({
+      where: { categoryId: id },
+      withDeleted: true,
+    });
+
+    if (productCount > 0) {
+      throw new CategoryInUseException();
+    }
+
+    await super.delete(id);
   }
 }
