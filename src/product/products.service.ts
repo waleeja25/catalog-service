@@ -44,6 +44,11 @@ export class ProductService extends BaseService<Product> {
     return this.getProductById(id);
   }
 
+  override async delete(id: number): Promise<void> {
+    await this.findById(id);
+    await this.repository.softDelete(id);
+  }
+
   async getProductById(id: number): Promise<CatalogProto.Product> {
     const product = await this.findOne({
       where: { id },
