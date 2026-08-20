@@ -65,12 +65,13 @@ export class CategoryService extends BaseService<Category> {
 
     const productCount = await this.productRepository.count({
       where: { categoryId: id },
-      withDeleted: true,
     });
 
     if (productCount > 0) {
       throw new CategoryInUseException();
     }
+
+    await this.productRepository.delete({ categoryId: id });
 
     await super.delete(id);
   }
