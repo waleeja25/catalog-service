@@ -27,6 +27,8 @@ export class ProductService extends BaseService<Product> {
 
     const product = await super.create(request);
 
+    this.logger.log(`Product ${product.id} created successfully`);
+
     return this.getProductById(product.id);
   }
 
@@ -41,12 +43,16 @@ export class ProductService extends BaseService<Product> {
 
     await super.update(id, data);
 
+    this.logger.log(`Product ${id} updated successfully`);
+
     return this.getProductById(id);
   }
 
   override async delete(id: number): Promise<void> {
     await this.findById(id);
     await this.repository.softDelete(id);
+
+    this.logger.log(`Product ${id} deleted successfully`);
   }
 
   async getProductById(id: number): Promise<CatalogProto.Product> {

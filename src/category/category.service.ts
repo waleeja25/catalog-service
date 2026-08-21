@@ -36,7 +36,11 @@ export class CategoryService extends BaseService<Category> {
       throw new CategoryNameExistsException();
     }
 
-    return super.create(data);
+    const category = await super.create(data);
+
+    this.logger.log(`Category ${category.id} created successfully`);
+
+    return category;
   }
 
   override async update(
@@ -57,7 +61,11 @@ export class CategoryService extends BaseService<Category> {
       }
     }
 
-    return super.update(id, data);
+    const category = await super.update(id, data);
+
+    this.logger.log(`Category ${id} updated successfully`);
+
+    return category;
   }
 
   override async delete(id: number): Promise<void> {
@@ -74,5 +82,7 @@ export class CategoryService extends BaseService<Category> {
     await this.productRepository.delete({ categoryId: id });
 
     await super.delete(id);
+
+    this.logger.log(`Category ${id} deleted successfully`);
   }
 }
