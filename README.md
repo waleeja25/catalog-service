@@ -8,15 +8,27 @@ NestJS, `@grpc/grpc-js`, TypeORM, MySQL
 
 ## gRPC methods
 
-**`CategoryService`** — `create`, `getById`, `update`, `delete`, `list`. A category can't be deleted while any product still references it (`CategoryInUseException`); category names must be unique.
+**`CategoryService`** — `create`, `getById`, `update`, `delete`, `list`. A category can't be deleted while any product still references it; category names must be unique.
 
-**`ProductService`** — `create`, `getById`, `update`, `delete`, `list` (supports pagination and free-text search across name/description/category name). Creating or moving a product validates that its `categoryId` actually exists first.
+**`ProductService`** — `create`, `getById`, `update`, `delete`, `list` (pagination + free-text search across name/description/category name). Creating or moving a product validates the referenced `categoryId` exists.
 
-Request payloads are validated with hand-written validator functions (not class-validator DTOs) via a custom `Validate()` pipe, so a bad payload becomes a real `INVALID_ARGUMENT` gRPC status rather than an HTTP-shaped error.
+Request payloads are validated with hand-written validator functions via a custom `Validate()` pipe, not class-validator DTOs.
 
 ## Error handling
 
-Business rule violations (duplicate name, category in use) and not-found lookups throw a typed `DomainException`, mapped to a gRPC status by `GrpcExceptionFilter`/`DomainExceptionFilter`. MySQL constraint violations are mapped by `DatabaseExceptionFilter`; unrecognized DB errors fall back to a generic `INTERNAL` status with the real error only logged server-side.
+Business rule violations and not-found lookups throw a typed `DomainException`, mapped to a gRPC status by `GrpcExceptionFilter`/`DomainExceptionFilter`. MySQL constraint violations are mapped by `DatabaseExceptionFilter`.
+
+## Folder structure
+
+```
+src/
+├── category/             # controller, service, mapper, entity, validators
+├── product/              # controller, service, mapper, entity, validators
+├── common/                # BaseEntity/BaseService, exceptions, filters, gRPC constants
+├── config/
+├── database/              # data source + migrations
+└── health/
+```
 
 ## Running locally
 
